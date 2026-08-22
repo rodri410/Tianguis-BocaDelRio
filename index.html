@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plano Interactivo de Locales</title>
+  <title>Plano Interactivo de 6 Locales</title>
   <style>
     body {
       margin: 0;
@@ -20,7 +20,7 @@
     }
 
     h1 {
-      margin-top: 40px;
+      margin-top: 30px;
       margin-bottom: 5px;
       font-weight: 600;
       color: #1a202c;
@@ -30,15 +30,15 @@
     p.subtitle {
       color: #718096;
       margin-top: 0;
-      margin-bottom: 25px;
-      font-size: 1.1rem;
+      margin-bottom: 20px;
+      font-size: 1.05rem;
     }
 
     .map-container {
       position: relative;
       width: 100%;
-      max-width: 850px;
-      padding: 20px;
+      max-width: 900px;
+      padding: 15px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -51,50 +51,54 @@
       display: block;
       border-radius: 16px;
       background: #ffffff;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
 
-    /* Estilo interactivo del cuadro */
-    .local-box {
+    /* Áreas interactivas transparentes sobre los locales */
+    .local-overlay {
       cursor: pointer;
       transform-box: fill-box;
       transform-origin: center;
-      transition: transform 0.25s ease, filter 0.25s ease, stroke 0.25s ease;
-      stroke-width: 3px;
-      stroke: #ffffff;
-      rx: 12px;
+      transition: transform 0.25s ease, fill-opacity 0.25s ease, stroke 0.25s ease;
+      fill: #3b82f6;
+      fill-opacity: 0.15;
+      stroke: #3b82f6;
+      stroke-width: 2px;
+      rx: 8px;
     }
 
-    /* Efecto Hover directo */
-    .local-box:hover, .local-box.active {
-      transform: scale(1.15) translateY(-5px);
-      filter: drop-shadow(0px 10px 18px rgba(0, 0, 0, 0.25));
-      stroke: #1e293b;
+    /* Efecto de elevación y resalte de color */
+    .local-overlay:hover, .local-overlay.active {
+      transform: scale(1.05);
+      fill-opacity: 0.35;
+      stroke: #1d4ed8;
       stroke-width: 4px;
+      filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.2));
     }
 
-    /* Texto dentro del cuadro (no interfiere con el cursor) */
-    .local-text {
+    /* Texto o indicador flotante */
+    .local-tag {
       pointer-events: none;
-      font-size: 16px;
-      fill: #ffffff;
-      font-weight: bold;
+      font-size: 14px;
+      fill: #1e293b;
+      font-weight: 700;
       text-anchor: middle;
       dominant-baseline: central;
     }
 
-    /* Tarjeta de información inferior */
+    /* Tarjeta flotante de información */
     .info-card {
-      margin-top: 25px;
+      margin-top: 20px;
       background: rgba(255, 255, 255, 0.98);
       border: 1px solid #e2e8f0;
-      padding: 18px 30px;
+      padding: 16px 28px;
       border-radius: 14px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       text-align: center;
       width: 100%;
-      max-width: 420px;
+      max-width: 450px;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      opacity: 0.5;
+      opacity: 0.6;
       transform: translateY(10px);
     }
 
@@ -121,72 +125,93 @@
 </head>
 <body>
 
-  <h1>Plano de Locales</h1>
-  <p class="subtitle">Pasa el cursor o presiona un local para ver sus detalles</p>
+  <h1>Plano Interactivo</h1>
+  <p class="subtitle">Pasa el cursor sobre cualquiera de los 6 locales</p>
 
   <div class="map-container">
-    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
-      <rect x="30" y="30" width="640" height="240" rx="15" fill="none" stroke="#f1f5f9" stroke-width="2"/>
+    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+      
+      <!-- Imagen de fondo (Reemplaza 'mapa.jpg' por el nombre de tu archivo en GitHub) -->
+      <image href="Practicaproyeto.jpg" x="0" y="0" width="900" height="500" preserveAspectRatio="none"/>
 
-      <!-- LOCAL 1 -->
+      <!-- FILA SUPERIOR -->
+      <!-- Local 1 (Arriba Izquierda) -->
       <g>
-        <rect class="local-box" x="70" y="90" width="120" height="100" fill="#0088cc" 
-              data-title="Local 1: Tienda Central" 
-              data-desc="Especialistas en ropa urbana moderna. ¡Visítanos!" />
-        <text class="local-text" x="130" y="140">Local 1</text>
+        <rect class="local-overlay" x="80" y="40" width="210" height="190"
+              data-title="Local 1: Modulo Norte A" 
+              data-desc="Área comercial de exhibición principal con acceso a terraza." />
+        <text class="local-tag" x="185" y="245">Local 1</text>
       </g>
 
-      <!-- LOCAL 2 -->
+      <!-- Local 2 (Arriba Centro) -->
       <g>
-        <rect class="local-box" x="210" y="90" width="120" height="100" fill="#00a86b" 
-              data-title="Local 2: Zona de Accesorios" 
-              data-desc="La mayor variedad de gorras y accesorios de la ciudad." />
-        <text class="local-text" x="270" y="140">Local 2</text>
+        <rect class="local-overlay" x="335" y="40" width="230" height="190"
+              data-title="Local 2: Modulo Norte B" 
+              data-desc="Espacio amplio de recepción, ideal para showroom o salas de junta." />
+        <text class="local-tag" x="450" y="245">Local 2</text>
       </g>
 
-      <!-- LOCAL 3 -->
+      <!-- Local 3 (Arriba Derecha) -->
       <g>
-        <rect class="local-box" x="350" y="90" width="120" height="100" fill="#6b5b95" 
-              data-title="Local 3: Punto de Eventos" 
-              data-desc="Zona de activaciones, DJ sets y lanzamientos especiales." />
-        <text class="local-text" x="410" y="140">Local 3</text>
+        <rect class="local-overlay" x="605" y="40" width="210" height="190"
+              data-title="Local 3: Modulo Norte C" 
+              data-desc="Área de oficinas privadas con área de servicios integrada." />
+        <text class="local-tag" x="710" y="245">Local 3</text>
       </g>
 
-      <!-- LOCAL 4 -->
+      <!-- FILA INFERIOR -->
+      <!-- Local 4 (Abajo Izquierda) -->
       <g>
-        <rect class="local-box" x="490" y="90" width="120" height="100" fill="#d96b27" 
-              data-title="Local 4: Showroom y Outlet" 
-              data-desc="Prueba las últimas colecciones y encuentra grandes ofertas." />
-        <text class="local-text" x="550" y="140">Local 4</text>
+        <rect class="local-overlay" x="80" y="270" width="210" height="190"
+              data-title="Local 4: Modulo Sur A" 
+              data-desc="Zona gastronómica o cafetería con acceso a pasillo lateral." />
+        <text class="local-tag" x="185" y="475">Local 4</text>
       </g>
+
+      <!-- Local 5 (Abajo Centro) -->
+      <g>
+        <rect class="local-overlay" x="335" y="270" width="230" height="190"
+              data-title="Local 5: Modulo Sur B" 
+              data-desc="Local central de doble altura con habitaciones de servicio." />
+        <text class="local-tag" x="450" y="475">Local 5</text>
+      </g>
+
+      <!-- Local 6 (Abajo Derecha) -->
+      <g>
+        <rect class="local-overlay" x="605" y="270" width="210" height="190"
+              data-title="Local 6: Modulo Sur C" 
+              data-desc="Oficina ejecutiva con suite privada y balcón exterior." />
+        <text class="local-tag" x="710" y="475">Local 6</text>
+      </g>
+
     </svg>
 
     <!-- Tarjeta flotante de información -->
     <div id="infoCard" class="info-card">
       <h3 id="cardTitle">Selecciona un local</h3>
-      <p id="cardDesc">Pasa el cursor o presiona cualquier cuadro arriba.</p>
+      <p id="cardDesc">Pasa el cursor sobre cualquiera de los 6 bloques arriba para ver su información.</p>
     </div>
   </div>
 
   <script>
-    const boxes = document.querySelectorAll('.local-box');
+    const overlays = document.querySelectorAll('.local-overlay');
     const infoCard = document.getElementById('infoCard');
     const cardTitle = document.getElementById('cardTitle');
     const cardDesc = document.getElementById('cardDesc');
 
-    function activateLocal(box) {
-      boxes.forEach(b => b.classList.remove('active'));
-      box.classList.add('active');
-      cardTitle.textContent = box.getAttribute('data-title');
-      cardDesc.textContent = box.getAttribute('data-desc');
+    function activateLocal(overlay) {
+      overlays.forEach(o => o.classList.remove('active'));
+      overlay.classList.add('active');
+      cardTitle.textContent = overlay.getAttribute('data-title');
+      cardDesc.textContent = overlay.getAttribute('data-desc');
       infoCard.classList.add('active');
     }
 
-    boxes.forEach(box => {
-      box.addEventListener('mouseenter', () => activateLocal(box));
-      box.addEventListener('click', (e) => {
+    overlays.forEach(overlay => {
+      overlay.addEventListener('mouseenter', () => activateLocal(overlay));
+      overlay.addEventListener('click', (e) => {
         e.stopPropagation();
-        activateLocal(box);
+        activateLocal(overlay);
       });
     });
   </script>
