@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plano Interactivo - Prueba 2</title>
+  <title>Plano Interactivo - Animación Corregida</title>
   <style>
     body {
       margin: 0;
@@ -50,44 +50,43 @@
       background: #ffffff;
     }
 
-    /* Base del local */
-    .pin {
-      stroke-width: 3px;
-      stroke: #ffffff;
-      rx: 10px;
-      transition: stroke 0.25s ease, stroke-width 0.25s ease;
-    }
-
-    /* Animación de levitación e interactividad táctil */
+    /* Grupo interactivo */
     .pin-group {
       cursor: pointer;
+    }
+
+    /* SOLUCIÓN TÉCNICA: Fuerza al cuadro a escalar exactamente desde su propio centro */
+    .pin {
       transform-box: fill-box;
       transform-origin: center;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
-      pointer-events: all;
+      transition: transform 0.25s ease, filter 0.25s ease;
+      rx: 10px;
+      stroke-width: 3px;
+      stroke: #ffffff;
     }
 
-    .pin-group * {
-      pointer-events: none;
-    }
-
-    /* Estado Hover y Activo: Aumento claro, levitación y resalte de borde */
-    .pin-group:hover, .pin-group.active {
-      transform: scale(1.18) translateY(-6px);
-      filter: drop-shadow(0px 12px 20px rgba(0, 0, 0, 0.2)) brightness(1.08);
-    }
-
+    /* Animación directa de cambio de tamaño al pasar el cursor */
     .pin-group:hover .pin, .pin-group.active .pin {
-      stroke: #1e293b;
-      stroke-width: 4px;
+      transform: scale(1.25);
+      filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.25));
     }
 
-    /* Tarjeta flotante con entrada elástica */
+    /* Texto interno centrado */
+    .pin-text {
+      pointer-events: none;
+      font-size: 16px;
+      fill: #ffffff;
+      font-weight: bold;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    /* Tarjeta flotante de información */
     .info-card {
       position: absolute;
       bottom: 10px;
       left: 50%;
-      transform: translateX(-50%) translateY(20px) scale(0.95);
+      transform: translateX(-50%) translateY(15px);
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(10px);
       border: 1px solid #e2e8f0;
@@ -98,13 +97,13 @@
       min-width: 260px;
       max-width: 380px;
       pointer-events: none;
-      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: opacity 0.25s ease, transform 0.25s ease;
       opacity: 0;
     }
 
     .info-card.visible {
       opacity: 1;
-      transform: translateX(-50%) translateY(0) scale(1);
+      transform: translateX(-50%) translateY(0);
     }
 
     .info-card h3 {
@@ -133,25 +132,25 @@
       <!-- LOCAL 1 -->
       <g class="pin-group" data-title="Local 1: Tienda Central" data-desc="Especialistas en ropa urbana moderna. ¡Visítanos!">
         <rect class="pin" x="120" y="100" width="110" height="80" fill="#3b82f6" />
-        <text x="175" y="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">Local 1</text>
+        <text class="pin-text" x="175" y="140">Local 1</text>
       </g>
 
       <!-- LOCAL 2 -->
       <g class="pin-group" data-title="Local 2: Zona de Accesorios" data-desc="La mayor variedad de gorras y accesorios de la ciudad.">
         <rect class="pin" x="250" y="100" width="110" height="80" fill="#10b981" />
-        <text x="305" y="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">Local 2</text>
+        <text class="pin-text" x="305" y="140">Local 2</text>
       </g>
 
       <!-- LOCAL 3 -->
       <g class="pin-group" data-title="Local 3: Punto de Eventos" data-desc="Zona de activaciones, DJ sets y lanzamientos especiales.">
         <rect class="pin" x="380" y="100" width="110" height="80" fill="#8b5cf6" />
-        <text x="435" y="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">Local 3</text>
+        <text class="pin-text" x="435" y="140">Local 3</text>
       </g>
 
       <!-- LOCAL 4 -->
       <g class="pin-group" data-title="Local 4: Showroom y Outlet" data-desc="Prueba las últimas colecciones y encuentra grandes ofertas.">
         <rect class="pin" x="510" y="100" width="110" height="80" fill="#f97316" />
-        <text x="565" y="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">Local 4</text>
+        <text class="pin-text" x="565" y="140">Local 4</text>
       </g>
     </svg>
 
@@ -198,5 +197,7 @@
     });
   </script>
 
+</body>
+</html>
 </body>
 </html>
