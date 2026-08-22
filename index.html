@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plano Interactivo - Animación Corregida</title>
+  <title>Plano Interactivo de Locales</title>
   <style>
     body {
       margin: 0;
@@ -30,16 +30,19 @@
     p.subtitle {
       color: #718096;
       margin-top: 0;
-      margin-bottom: 35px;
+      margin-bottom: 25px;
       font-size: 1.1rem;
     }
 
     .map-container {
       position: relative;
       width: 100%;
-      max-width: 900px;
+      max-width: 850px;
       padding: 20px;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     svg {
@@ -50,29 +53,27 @@
       background: #ffffff;
     }
 
-    /* Grupo interactivo */
-    .pin-group {
+    /* Estilo interactivo del cuadro */
+    .local-box {
       cursor: pointer;
-    }
-
-    /* SOLUCIÓN TÉCNICA: Fuerza al cuadro a escalar exactamente desde su propio centro */
-    .pin {
       transform-box: fill-box;
       transform-origin: center;
-      transition: transform 0.25s ease, filter 0.25s ease;
-      rx: 10px;
+      transition: transform 0.25s ease, filter 0.25s ease, stroke 0.25s ease;
       stroke-width: 3px;
       stroke: #ffffff;
+      rx: 12px;
     }
 
-    /* Animación directa de cambio de tamaño al pasar el cursor */
-    .pin-group:hover .pin, .pin-group.active .pin {
-      transform: scale(1.25);
-      filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.25));
+    /* Efecto Hover directo */
+    .local-box:hover, .local-box.active {
+      transform: scale(1.15) translateY(-5px);
+      filter: drop-shadow(0px 10px 18px rgba(0, 0, 0, 0.25));
+      stroke: #1e293b;
+      stroke-width: 4px;
     }
 
-    /* Texto interno centrado */
-    .pin-text {
+    /* Texto dentro del cuadro (no interfiere con el cursor) */
+    .local-text {
       pointer-events: none;
       font-size: 16px;
       fill: #ffffff;
@@ -81,40 +82,38 @@
       dominant-baseline: central;
     }
 
-    /* Tarjeta flotante de información */
+    /* Tarjeta de información inferior */
     .info-card {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%) translateY(15px);
+      margin-top: 25px;
       background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(10px);
       border: 1px solid #e2e8f0;
-      padding: 16px 28px;
+      padding: 18px 30px;
       border-radius: 14px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       text-align: center;
-      min-width: 260px;
-      max-width: 380px;
-      pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      opacity: 0;
+      width: 100%;
+      max-width: 420px;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      opacity: 0.5;
+      transform: translateY(10px);
     }
 
-    .info-card.visible {
+    .info-card.active {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
+      border-color: #3b82f6;
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15);
     }
 
     .info-card h3 {
       margin: 0 0 6px 0;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       color: #1a202c;
     }
 
     .info-card p {
       margin: 0;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       color: #4a5568;
       line-height: 1.4;
     }
@@ -123,81 +122,74 @@
 <body>
 
   <h1>Plano de Locales</h1>
-  <p class="subtitle">Pasa el cursor sobre un local para ver sus detalles</p>
+  <p class="subtitle">Pasa el cursor o presiona un local para ver sus detalles</p>
 
   <div class="map-container">
-    <svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
-      <rect x="50" y="50" width="600" height="300" rx="15" fill="none" stroke="#f1f5f9" stroke-width="2"/>
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="30" width="640" height="240" rx="15" fill="none" stroke="#f1f5f9" stroke-width="2"/>
 
       <!-- LOCAL 1 -->
-      <g class="pin-group" data-title="Local 1: Tienda Central" data-desc="Especialistas en ropa urbana moderna. ¡Visítanos!">
-        <rect class="pin" x="120" y="100" width="110" height="80" fill="#3b82f6" />
-        <text class="pin-text" x="175" y="140">Local 1</text>
+      <g>
+        <rect class="local-box" x="70" y="90" width="120" height="100" fill="#0088cc" 
+              data-title="Local 1: Tienda Central" 
+              data-desc="Especialistas en ropa urbana moderna. ¡Visítanos!" />
+        <text class="local-text" x="130" y="140">Local 1</text>
       </g>
 
       <!-- LOCAL 2 -->
-      <g class="pin-group" data-title="Local 2: Zona de Accesorios" data-desc="La mayor variedad de gorras y accesorios de la ciudad.">
-        <rect class="pin" x="250" y="100" width="110" height="80" fill="#10b981" />
-        <text class="pin-text" x="305" y="140">Local 2</text>
+      <g>
+        <rect class="local-box" x="210" y="90" width="120" height="100" fill="#00a86b" 
+              data-title="Local 2: Zona de Accesorios" 
+              data-desc="La mayor variedad de gorras y accesorios de la ciudad." />
+        <text class="local-text" x="270" y="140">Local 2</text>
       </g>
 
       <!-- LOCAL 3 -->
-      <g class="pin-group" data-title="Local 3: Punto de Eventos" data-desc="Zona de activaciones, DJ sets y lanzamientos especiales.">
-        <rect class="pin" x="380" y="100" width="110" height="80" fill="#8b5cf6" />
-        <text class="pin-text" x="435" y="140">Local 3</text>
+      <g>
+        <rect class="local-box" x="350" y="90" width="120" height="100" fill="#6b5b95" 
+              data-title="Local 3: Punto de Eventos" 
+              data-desc="Zona de activaciones, DJ sets y lanzamientos especiales." />
+        <text class="local-text" x="410" y="140">Local 3</text>
       </g>
 
       <!-- LOCAL 4 -->
-      <g class="pin-group" data-title="Local 4: Showroom y Outlet" data-desc="Prueba las últimas colecciones y encuentra grandes ofertas.">
-        <rect class="pin" x="510" y="100" width="110" height="80" fill="#f97316" />
-        <text class="pin-text" x="565" y="140">Local 4</text>
+      <g>
+        <rect class="local-box" x="490" y="90" width="120" height="100" fill="#d96b27" 
+              data-title="Local 4: Showroom y Outlet" 
+              data-desc="Prueba las últimas colecciones y encuentra grandes ofertas." />
+        <text class="local-text" x="550" y="140">Local 4</text>
       </g>
     </svg>
 
+    <!-- Tarjeta flotante de información -->
     <div id="infoCard" class="info-card">
       <h3 id="cardTitle">Selecciona un local</h3>
-      <p id="cardDesc">Pasa el cursor sobre un punto para ver más detalles.</p>
+      <p id="cardDesc">Pasa el cursor o presiona cualquier cuadro arriba.</p>
     </div>
   </div>
 
   <script>
-    const pinGroups = document.querySelectorAll('.pin-group');
+    const boxes = document.querySelectorAll('.local-box');
     const infoCard = document.getElementById('infoCard');
     const cardTitle = document.getElementById('cardTitle');
     const cardDesc = document.getElementById('cardDesc');
 
-    pinGroups.forEach(group => {
-      const showInfo = () => {
-        cardTitle.textContent = group.getAttribute('data-title');
-        cardDesc.textContent = group.getAttribute('data-desc');
-        infoCard.classList.add('visible');
-        
-        document.querySelectorAll('.pin-group').forEach(p => p.classList.remove('active'));
-        group.classList.add('active');
-      };
+    function activateLocal(box) {
+      boxes.forEach(b => b.classList.remove('active'));
+      box.classList.add('active');
+      cardTitle.textContent = box.getAttribute('data-title');
+      cardDesc.textContent = box.getAttribute('data-desc');
+      infoCard.classList.add('active');
+    }
 
-      const hideInfo = () => {
-        if (matchMedia('(pointer:fine)').matches) {
-           infoCard.classList.remove('visible');
-           group.classList.remove('active');
-        }
-      };
-
-      group.addEventListener('mouseenter', showInfo);
-      group.addEventListener('mouseleave', hideInfo);
-      group.addEventListener('click', (e) => {
-          e.stopPropagation();
-          showInfo();
+    boxes.forEach(box => {
+      box.addEventListener('mouseenter', () => activateLocal(box));
+      box.addEventListener('click', (e) => {
+        e.stopPropagation();
+        activateLocal(box);
       });
-    });
-
-    document.addEventListener('click', () => {
-        infoCard.classList.remove('visible');
-        document.querySelectorAll('.pin-group').forEach(p => p.classList.remove('active'));
     });
   </script>
 
-</body>
-</html>
 </body>
 </html>
