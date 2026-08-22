@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plano Interactivo de 6 Locales</title>
+  <title>Plano Interactivo con Ficha de Locales</title>
   <style>
     body {
       margin: 0;
@@ -14,7 +14,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
       color: #333;
       overflow-x: hidden;
     }
@@ -24,14 +23,12 @@
       margin-bottom: 5px;
       font-weight: 600;
       color: #1a202c;
-      font-size: 2.2rem;
     }
 
     p.subtitle {
       color: #718096;
       margin-top: 0;
       margin-bottom: 20px;
-      font-size: 1.05rem;
     }
 
     .map-container {
@@ -40,9 +37,6 @@
       max-width: 900px;
       padding: 15px;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
     svg {
@@ -54,7 +48,7 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
 
-    /* Áreas interactivas transparentes sobre los locales */
+    /* Interacción sobre mapa */
     .local-overlay {
       cursor: pointer;
       transform-box: fill-box;
@@ -67,16 +61,13 @@
       rx: 8px;
     }
 
-    /* Efecto de elevación y resalte de color */
-    .local-overlay:hover, .local-overlay.active {
-      transform: scale(1.05);
+    .local-overlay:hover {
+      transform: scale(1.04);
       fill-opacity: 0.35;
       stroke: #1d4ed8;
-      stroke-width: 4px;
-      filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.2));
+      stroke-width: 3px;
     }
 
-    /* Texto o indicador flotante */
     .local-tag {
       pointer-events: none;
       font-size: 14px;
@@ -86,135 +77,277 @@
       dominant-baseline: central;
     }
 
-    /* Tarjeta flotante de información */
-    .info-card {
-      margin-top: 20px;
-      background: rgba(255, 255, 255, 0.98);
-      border: 1px solid #e2e8f0;
-      padding: 16px 28px;
-      border-radius: 14px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      text-align: center;
-      width: 100%;
-      max-width: 450px;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      opacity: 0.6;
-      transform: translateY(10px);
+    /* VENTANA MODAL (POP-UP) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
     }
 
-    .info-card.active {
+    .modal-overlay.active {
       opacity: 1;
-      transform: translateY(0);
-      border-color: #3b82f6;
-      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15);
+      pointer-events: all;
     }
 
-    .info-card h3 {
-      margin: 0 0 6px 0;
-      font-size: 1.2rem;
-      color: #1a202c;
+    .modal-card {
+      background: #ffffff;
+      width: 90%;
+      max-width: 440px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      position: relative;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    .info-card p {
+    .modal-overlay.active .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Botón Cerrar */
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ENCABEZADO Y PORTADA */
+    .profile-header {
+      position: relative;
+      height: 120px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Nube de estado / anuncio corto */
+    .status-cloud {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #2563eb;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Foto de Perfil Redonda */
+    .avatar-container {
+      position: absolute;
+      bottom: -30px;
+      left: 20px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      background: #e2e8f0;
+    }
+
+    .avatar-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* CONTENIDO DE LA FICHA */
+    .modal-body {
+      padding: 40px 20px 20px 20px;
+    }
+
+    .badge-plan {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .badge-normal { background: #e2e8f0; color: #475569; }
+    .badge-premium { background: #fef3c7; color: #d97706; }
+
+    .shop-title {
       margin: 0;
-      font-size: 0.95rem;
-      color: #4a5568;
+      font-size: 1.3rem;
+      color: #0f172a;
+    }
+
+    .shop-category {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .shop-desc {
+      font-size: 0.9rem;
+      color: #334155;
       line-height: 1.4;
+      margin-bottom: 15px;
+    }
+
+    /* Galería Premium */
+    .gallery-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      overflow-x: auto;
+    }
+
+    .gallery-img {
+      width: 90px;
+      height: 70px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #cbd5e1;
+    }
+
+    /* Botón de Contacto */
+    .btn-whatsapp {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #25d366;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 10px;
+      box-sizing: border-box;
     }
   </style>
 </head>
 <body>
 
   <h1>Plano Interactivo</h1>
-  <p class="subtitle">Pasa el cursor sobre cualquiera de los 6 locales</p>
+  <p class="subtitle">Haz clic en un local para ver su ficha comercial</p>
 
   <div class="map-container">
     <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
-      
-      <!-- Imagen de fondo (Reemplaza 'mapa.jpg' por el nombre de tu archivo en GitHub) -->
       <image href="Practicaproyeto.jpg" x="0" y="0" width="900" height="500" preserveAspectRatio="none"/>
 
-      <!-- FILA SUPERIOR -->
-      <!-- Local 1 (Arriba Izquierda) -->
-      <g>
-        <rect class="local-overlay" x="80" y="40" width="210" height="190"
-              data-title="Local 1: Modulo Norte A" 
-              data-desc="Área comercial de exhibición principal con acceso a terraza." />
-        <text class="local-tag" x="185" y="245">Local 1</text>
-      </g>
+      <!-- Plan Normal (Locales 1, 2, 3) -->
+      <g><rect class="local-overlay" x="80" y="40" width="210" height="190" onclick="openShop(1)" /><text class="local-tag" x="185" y="245">Local 1 ($100)</text></g>
+      <g><rect class="local-overlay" x="335" y="40" width="230" height="190" onclick="openShop(2)" /><text class="local-tag" x="450" y="245">Local 2 ($100)</text></g>
+      <g><rect class="local-overlay" x="605" y="40" width="210" height="190" onclick="openShop(3)" /><text class="local-tag" x="710" y="245">Local 3 ($100)</text></g>
 
-      <!-- Local 2 (Arriba Centro) -->
-      <g>
-        <rect class="local-overlay" x="335" y="40" width="230" height="190"
-              data-title="Local 2: Modulo Norte B" 
-              data-desc="Espacio amplio de recepción, ideal para showroom o salas de junta." />
-        <text class="local-tag" x="450" y="245">Local 2</text>
-      </g>
-
-      <!-- Local 3 (Arriba Derecha) -->
-      <g>
-        <rect class="local-overlay" x="605" y="40" width="210" height="190"
-              data-title="Local 3: Modulo Norte C" 
-              data-desc="Área de oficinas privadas con área de servicios integrada." />
-        <text class="local-tag" x="710" y="245">Local 3</text>
-      </g>
-
-      <!-- FILA INFERIOR -->
-      <!-- Local 4 (Abajo Izquierda) -->
-      <g>
-        <rect class="local-overlay" x="80" y="270" width="210" height="190"
-              data-title="Local 4: Modulo Sur A" 
-              data-desc="Zona gastronómica o cafetería con acceso a pasillo lateral." />
-        <text class="local-tag" x="185" y="475">Local 4</text>
-      </g>
-
-      <!-- Local 5 (Abajo Centro) -->
-      <g>
-        <rect class="local-overlay" x="335" y="270" width="230" height="190"
-              data-title="Local 5: Modulo Sur B" 
-              data-desc="Local central de doble altura con habitaciones de servicio." />
-        <text class="local-tag" x="450" y="475">Local 5</text>
-      </g>
-
-      <!-- Local 6 (Abajo Derecha) -->
-      <g>
-        <rect class="local-overlay" x="605" y="270" width="210" height="190"
-              data-title="Local 6: Modulo Sur C" 
-              data-desc="Oficina ejecutiva con suite privada y balcón exterior." />
-        <text class="local-tag" x="710" y="475">Local 6</text>
-      </g>
-
+      <!-- Plan Premium (Locales 4, 5, 6) -->
+      <g><rect class="local-overlay" x="80" y="270" width="210" height="190" onclick="openShop(4)" /><text class="local-tag" x="185" y="475">Local 4 ($250)</text></g>
+      <g><rect class="local-overlay" x="335" y="270" width="230" height="190" onclick="openShop(5)" /><text class="local-tag" x="450" y="475">Local 5 ($250)</text></g>
+      <g><rect class="local-overlay" x="605" y="270" width="210" height="190" onclick="openShop(6)" /><text class="local-tag" x="710" y="475">Local 6 ($250)</text></g>
     </svg>
+  </div>
 
-    <!-- Tarjeta flotante de información -->
-    <div id="infoCard" class="info-card">
-      <h3 id="cardTitle">Selecciona un local</h3>
-      <p id="cardDesc">Pasa el cursor sobre cualquiera de los 6 bloques arriba para ver su información.</p>
+  <!-- POP-UP / VENTANA MODAL -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeModal()">✕</button>
+      
+      <div id="modalHeader" class="profile-header">
+        <div id="modalCloud" class="status-cloud">☁️ Novedades</div>
+        <div class="avatar-container">
+          <img id="modalAvatar" src="" alt="Logo">
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <span id="modalBadge" class="badge-plan">PLAN</span>
+        <h2 id="modalTitle" class="shop-title">Nombre del Local</h2>
+        <div id="modalCategory" class="shop-category">Categoría</div>
+        <p id="modalDesc" class="shop-desc">Descripción...</p>
+
+        <!-- Sección Exclusiva Premium -->
+        <div id="premiumSection" style="display: none;">
+          <strong style="font-size:0.85rem; color:#475569;">Galería de Productos:</strong>
+          <div class="gallery-container">
+            <img class="gallery-img" src="https://via.placeholder.com/150/3b82f6/ffffff?text=Producto+1" />
+            <img class="gallery-img" src="https://via.placeholder.com/150/10b981/ffffff?text=Producto+2" />
+            <img class="gallery-img" src="https://via.placeholder.com/150/8b5cf6/ffffff?text=Producto+3" />
+          </div>
+        </div>
+
+        <a id="modalWsp" href="#" target="_blank" class="btn-whatsapp">Enviar mensaje a WhatsApp</a>
+      </div>
     </div>
   </div>
 
   <script>
-    const overlays = document.querySelectorAll('.local-overlay');
-    const infoCard = document.getElementById('infoCard');
-    const cardTitle = document.getElementById('cardTitle');
-    const cardDesc = document.getElementById('cardDesc');
+    /* Datos simulados para pruebas */
+    const shopsData = {
+      1: { plan: 'normal', name: 'Novedades María', cat: 'Pasillo 1 - Puesto 12', desc: 'Venta de accesorios cotidianos, mochilas y artículos escolares.', bg: '#94a3b8', avatar: 'https://via.placeholder.com/100/64748b/ffffff?text=M', wsp: '521234567890' },
+      2: { plan: 'normal', name: 'Reparaciones Alex', cat: 'Pasillo 1 - Puesto 14', desc: 'Mantenimiento rápido de celulares, fundas y micas de cristal.', bg: '#94a3b8', avatar: 'https://via.placeholder.com/100/64748b/ffffff?text=A', wsp: '521234567890' },
+      3: { plan: 'normal', name: 'Calzado El Paso', cat: 'Pasillo 1 - Puesto 18', desc: 'Tenis económicos y calzado nacional para toda la familia.', bg: '#94a3b8', avatar: 'https://via.placeholder.com/100/64748b/ffffff?text=P', wsp: '521234567890' },
+      4: { plan: 'premium', name: 'Urban Streetwear', cat: 'Pasillo 2 - Puesto 05 (Verificado ⭐)', cloud: '🔥 ¡2x1 en gorras hoy!', desc: 'Especialistas en moda urbana oversize, prendas exclusivas y marcas tendencia.', bg: 'linear-gradient(135deg, #2563eb, #1d4ed8)', avatar: 'https://via.placeholder.com/100/2563eb/ffffff?text=Urban', wsp: '521234567890' },
+      5: { plan: 'premium', name: 'Tacos & Antojitos San José', cat: 'Pasillo 2 - Comida (Verificado ⭐)', cloud: '🌮 Menú ejecutivo $75', desc: 'Servicio de comida corrida, aguas frescas de fruta natural y especialidades al pastor.', bg: 'linear-gradient(135deg, #d97706, #b45309)', avatar: 'https://via.placeholder.com/100/d97706/ffffff?text=Tacos', wsp: '521234567890' },
+      6: { plan: 'premium', name: 'Importaciones Tech', cat: 'Pasillo 2 - Electrónica (Verificado ⭐)', cloud: '⚡ Gadgets con garantía', desc: 'Bocinas Bluetooth, audífonos inalámbricos y smartwatch de última generación.', bg: 'linear-gradient(135deg, #7c3aed, #6d28d9)', avatar: 'https://via.placeholder.com/100/7c3aed/ffffff?text=Tech', wsp: '521234567890' }
+    };
 
-    function activateLocal(overlay) {
-      overlays.forEach(o => o.classList.remove('active'));
-      overlay.classList.add('active');
-      cardTitle.textContent = overlay.getAttribute('data-title');
-      cardDesc.textContent = overlay.getAttribute('data-desc');
-      infoCard.classList.add('active');
+    function openShop(id) {
+      const data = shopsData[id];
+      if (!data) return;
+
+      document.getElementById('modalTitle').textContent = data.name;
+      document.getElementById('modalCategory').textContent = data.cat;
+      document.getElementById('modalDesc').textContent = data.desc;
+      document.getElementById('modalAvatar').src = data.avatar;
+      document.getElementById('modalWsp').href = `https://wa.me/${data.wsp}`;
+
+      const header = document.getElementById('modalHeader');
+      const badge = document.getElementById('modalBadge');
+      const cloud = document.getElementById('modalCloud');
+      const premiumSec = document.getElementById('premiumSection');
+
+      if (data.plan === 'premium') {
+        header.style.background = data.bg;
+        badge.textContent = 'PLAN PREMIUM ⭐';
+        badge.className = 'badge-plan badge-premium';
+        cloud.style.display = 'block';
+        cloud.textContent = data.cloud;
+        premiumSec.style.display = 'block';
+      } else {
+        header.style.background = '#64748b';
+        badge.textContent = 'PLAN NORMAL';
+        badge.className = 'badge-plan badge-normal';
+        cloud.style.display = 'none';
+        premiumSec.style.display = 'none';
+      }
+
+      document.getElementById('modalOverlay').classList.add('active');
     }
 
-    overlays.forEach(overlay => {
-      overlay.addEventListener('mouseenter', () => activateLocal(overlay));
-      overlay.addEventListener('click', (e) => {
-        e.stopPropagation();
-        activateLocal(overlay);
-      });
-    });
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
   </script>
-
 </body>
 </html>
