@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plano Interactivo - Perfil Comercial</title>
+  <title>Plano Interactivo - Con Vista Previa Flotante</title>
   <style>
     body {
       margin: 0;
@@ -65,214 +65,194 @@
       dominant-baseline: central;
     }
 
-    /* VENTANA MODAL FLUIDA TIPO PERFIL */
+    /* TARJETA / NUBE FLOTANTE QUE SIGUE AL CURSOR (TOOLTIP) */
+    .map-tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 8px 14px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      transform: translate(-50%, -125%) scale(0.9);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 500;
+    }
+
+    .map-tooltip.active {
+      opacity: 1;
+      transform: translate(-50%, -125%) scale(1);
+    }
+
+    .tooltip-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #3b82f6;
+      background: #f1f5f9;
+    }
+
+    .tooltip-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tooltip-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .tooltip-tagline {
+      font-size: 0.75rem;
+      color: #2563eb;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* MODAL DE PERFIL COMPLETO (AL DAR CLIC) */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(15, 23, 42, 0.7);
       backdrop-filter: blur(5px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease; z-index: 1000;
     }
 
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
 
     .modal-card {
-      background: #ffffff;
-      width: 92%;
-      max-width: 500px;
-      border-radius: 20px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-      position: relative;
-      transform: translateY(20px) scale(0.95);
+      background: #ffffff; width: 92%; max-width: 500px;
+      border-radius: 20px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      position: relative; transform: translateY(20px) scale(0.95);
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      max-height: 88vh;
-      overflow-y: auto;
-      box-sizing: border-box;
+      max-height: 88vh; overflow-y: auto; box-sizing: border-box;
     }
 
-    .modal-overlay.active .modal-card {
-      transform: translateY(0) scale(1);
-    }
+    .modal-overlay.active .modal-card { transform: translateY(0) scale(1); }
 
     .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: rgba(0, 0, 0, 0.5);
-      color: #ffffff;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-weight: bold;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(0, 0, 0, 0.5); color: #ffffff; border: none;
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      font-weight: bold; z-index: 10; display: flex; align-items: center; justify-content: center;
     }
 
-    /* ENCABEZADO TIPO FACEBOOK: PORTADA + RUEDA PROFILE */
-    .profile-header {
-      position: relative;
-      width: 100%;
-      height: 160px;
-    }
-
-    .cover-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      background: #cbd5e1;
-    }
-
+    .profile-header { position: relative; width: 100%; height: 160px; }
+    .cover-img { width: 100%; height: 100%; object-fit: cover; background: #cbd5e1; }
+    
     .avatar-wrapper {
-      position: absolute;
-      bottom: -35px;
-      left: 20px;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 4px solid #ffffff;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-      background: #ffffff;
+      position: absolute; bottom: -35px; left: 20px;
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 4px solid #ffffff; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18); background: #ffffff;
     }
 
-    .avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* CUERPO INTERNO CON SCROLL DESPLEGABLE */
-    .profile-body {
-      padding: 45px 20px 20px 20px;
-    }
+    .avatar-img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-body { padding: 45px 20px 20px 20px; }
 
     .badge-plan {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      margin-bottom: 6px;
+      display: inline-block; padding: 3px 8px; border-radius: 6px;
+      font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 6px;
     }
-
     .badge-normal { background: #e2e8f0; color: #475569; }
     .badge-premium { background: #fef3c7; color: #d97706; }
 
     .shop-title { margin: 0; font-size: 1.4rem; color: #0f172a; }
     .shop-category { font-size: 0.85rem; color: #64748b; margin-bottom: 12px; }
 
-    /* ANUNCIO ABAJO DEL PERFIL */
     .status-box {
-      background: #f0fdf4;
-      border: 1px dashed #22c55e;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      color: #15803d;
-      font-weight: 600;
-      margin-bottom: 15px;
+      background: #f0fdf4; border: 1px dashed #22c55e;
+      padding: 10px 14px; border-radius: 10px; font-size: 0.88rem;
+      color: #15803d; font-weight: 600; margin-bottom: 15px;
     }
 
     .shop-desc { font-size: 0.9rem; color: #334155; line-height: 1.5; margin-bottom: 15px; }
 
-    /* SECCIÓN DE PRODUCTOS DESPLEGABLE CON SCROLL */
-    .catalog-section {
-      margin-top: 15px;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 15px;
-    }
+    .catalog-section { margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+    .catalog-title { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
 
-    .catalog-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 10px;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .product-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 8px;
-      text-align: center;
-    }
-
-    .product-card img {
-      width: 100%;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 6px;
-    }
-
+    .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+    .product-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; text-align: center; }
+    .product-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px; }
     .product-name { font-size: 0.8rem; font-weight: 600; color: #1e293b; margin: 0; }
     .product-price { font-size: 0.8rem; color: #2563eb; font-weight: bold; }
 
     .btn-whatsapp {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: #25d366;
-      color: white;
-      text-align: center;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 10px;
-      box-sizing: border-box;
+      display: block; width: 100%; padding: 12px; background: #25d366;
+      color: white; text-align: center; text-decoration: none;
+      font-weight: bold; border-radius: 10px; box-sizing: border-box;
     }
   </style>
 </head>
 <body>
 
   <h1>Plano Interactivo</h1>
-  <p class="subtitle">Haz clic en un local para desplegar su perfil comercial</p>
+  <p class="subtitle">Pasa el cursor para vista previa o haz clic para ver la ficha completa</p>
 
   <div class="map-container">
     <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
-      <!-- LÍNEA DE LA IMAGEN DE FONDO (AQUÍ REEMPLAZAS EL NOMBRE) -->
+      <!-- LÍNEA 286: NOMBRE DE TU IMAGEN SUBIDA A GITHUB -->
       <image href="Practicaproyeto.jpg" x="0" y="0" width="900" height="500" preserveAspectRatio="none"/>
 
-      <!-- Locales Interactivos -->
-      <g><rect class="local-overlay" x="80" y="40" width="210" height="190" onclick="openShop(1)" /><text class="local-tag" x="185" y="245">Local 1 ($100)</text></g>
-      <g><rect class="local-overlay" x="335" y="40" width="230" height="190" onclick="openShop(2)" /><text class="local-tag" x="450" y="245">Local 2 ($100)</text></g>
-      <g><rect class="local-overlay" x="605" y="40" width="210" height="190" onclick="openShop(3)" /><text class="local-tag" x="710" y="245">Local 3 ($100)</text></g>
+      <!-- Eventos agregados: showTooltip, moveTooltip, hideTooltip -->
+      <g>
+        <rect class="local-overlay" x="80" y="40" width="210" height="190" 
+              onmouseover="showTooltip(event, 1)" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" onclick="openShop(1)" />
+        <text class="local-tag" x="185" y="245">Local 1 ($100)</text>
+      </g>
+      <g>
+        <rect class="local-overlay" x="335" y="40" width="230" height="190" 
+              onmouseover="showTooltip(event, 2)" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" onclick="openShop(2)" />
+        <text class="local-tag" x="450" y="245">Local 2 ($100)</text>
+      </g>
+      <g>
+        <rect class="local-overlay" x="605" y="40" width="210" height="190" 
+              onmouseover="showTooltip(event, 3)" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" onclick="openShop(3)" />
+        <text class="local-tag" x="710" y="245">Local 3 ($100)</text>
+      </g>
 
-      <g><rect class="local-overlay" x="80" y="270" width="210" height="190" onclick="openShop(4)" /><text class="local-tag" x="185" y="475">Local 4 ($250)</text></g>
-      <g><rect class="local-overlay" x="335" y="270" width="230" height="190" onclick="openShop(5)" /><text class="local-tag" x="450" y="475">Local 5 ($250)</text></g>
-      <g><rect class="local-overlay" x="605" y="270" width="210" height="190" onclick="openShop(6)" /><text class="local-tag" x="710" y="475">Local 6 ($250)</text></g>
+      <g>
+        <rect class="local-overlay" x="80" y="270" width="210" height="190" 
+              onmouseover="showTooltip(event, 4)" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" onclick="openShop(4)" />
+        <text class="local-tag" x="185" y="475">Local 4 ($250)</text>
+      </g>
+      <g>
+        <rect class="local-overlay" x="335" y="270" width="230" height="190" 
+              onmouseover="showTooltip(event, 5)" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" onclick="openShop(5)" />
+        <text class="local-tag" x="450" y="475">Local 5 ($250)</text>
+      </g>
+      <g>
+        <rect class="local-overlay" x="605" y="270" width="210" height="190" 
+              onmouseover="showTooltip(event, 6)" onmousemove="moveTooltip(event)" onmouseout="hideTooltip()" onclick="openShop(6)" />
+        <text class="local-tag" x="710" y="475">Local 6 ($250)</text>
+      </g>
     </svg>
   </div>
 
-  <!-- POP-UP TIPO PERFIL CON SCROLL -->
+  <!-- NUBE / TARJETA FLOTANTE (TOOLTIP PREVIEW) -->
+  <div id="mapTooltip" class="map-tooltip">
+    <img id="tooltipAvatar" class="tooltip-avatar" src="" alt="Logo">
+    <div class="tooltip-info">
+      <p id="tooltipTitle" class="tooltip-title">Nombre del Local</p>
+      <p id="tooltipTagline" class="tooltip-tagline">Giro comercial</p>
+    </div>
+  </div>
+
+  <!-- MODAL COMPLETO AL HACER CLIC -->
   <div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
     <div class="modal-card" onclick="event.stopPropagation()">
       <button class="close-btn" onclick="closeModal()">✕</button>
 
-      <!-- FOTO DE PORTADA + FOTO PERFIL REDONDA -->
       <div class="profile-header">
         <img id="modalCover" class="cover-img" src="" alt="Portada">
         <div class="avatar-wrapper">
@@ -280,7 +260,6 @@
         </div>
       </div>
 
-      <!-- DATOS Y CONTENIDO -->
       <div class="profile-body">
         <span id="modalBadge" class="badge-plan">PLAN</span>
         <h2 id="modalTitle" class="shop-title">Nombre</h2>
@@ -292,12 +271,9 @@
 
         <p id="modalDesc" class="shop-desc">Descripción...</p>
 
-        <!-- SECCIÓN DE PRODUCTOS QUE ADAPTA SEGÚN EL GIRO -->
         <div class="catalog-section">
-          <div id="catalogTitle" class="catalog-title">Muestra de Productos (Desliza hacia abajo)</div>
-          <div id="productGrid" class="product-grid">
-            <!-- Cargado dinámicamente -->
-          </div>
+          <div class="catalog-title">Muestra de Productos (Desliza hacia abajo)</div>
+          <div id="productGrid" class="product-grid"></div>
         </div>
 
         <a id="modalWsp" href="#" target="_blank" class="btn-whatsapp">Contactar por WhatsApp</a>
@@ -309,50 +285,115 @@
     const shopsData = {
       1: { 
         plan: 'normal', 
-        name: 'Abarrotes & Novedades', 
+        name: 'Abarrotes María', 
+        tagline: 'Abarrotes y golosinas',
         cat: 'Pasillo 1 - Puesto 08', 
         desc: 'Surtido general de abarrotes, golosinas y artículos del hogar.',
         cover: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=600',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200',
         products: [
-          { name: 'Botanas variadas', price: '$25 MXN', img: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=300' },
-          { name: 'Bebidas frías', price: '$20 MXN', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' }
+          { name: 'Botanas variadas', price: '$25 MXN', img: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=300' }
+        ],
+        wsp: '521234567890'
+      },
+      2: { 
+        plan: 'normal', 
+        name: 'Reparaciones Alex', 
+        tagline: 'Fundas y micas de celular',
+        cat: 'Pasillo 1 - Puesto 14', 
+        desc: 'Mantenimiento rápido de celulares, fundas y micas de cristal.',
+        cover: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+        products: [
+          { name: 'Mica de Cristal 9D', price: '$50 MXN', img: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=300' }
+        ],
+        wsp: '521234567890'
+      },
+      3: { 
+        plan: 'normal', 
+        name: 'Calzado El Paso', 
+        tagline: 'Tenis y calzado familiar',
+        cat: 'Pasillo 1 - Puesto 18', 
+        desc: 'Tenis económicos y calzado nacional para toda la familia.',
+        cover: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600',
+        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200',
+        products: [
+          { name: 'Tenis Urbanos', price: '$280 MXN', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300' }
         ],
         wsp: '521234567890'
       },
       4: { 
         plan: 'premium', 
         name: 'Urban Streetwear ⭐', 
-        cat: 'Pasillo 2 - Puesto 05 (Ropa & Moda)', 
+        tagline: 'Moda Dama, Caballero & Gorras',
+        cat: 'Pasillo 2 - Puesto 05 (Moda & Gorras)', 
         status: '🔥 Descuento del 15% en gorras y playeras oversize hoy.',
         desc: 'Colección de moda urbana, modelaje de gorras, sudaderas y prendas exclusivas.',
         cover: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200',
+        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200',
         products: [
           { name: 'Gorra Snapback Urban', price: '$220 MXN', img: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300' },
-          { name: 'Playera Oversize Black', price: '$180 MXN', img: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' },
-          { name: 'Sudadera Hoodie Grey', price: '$350 MXN', img: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=300' },
-          { name: 'Gorra Trucker Vintage', price: '$190 MXN', img: 'https://images.unsplash.com/photo-1534215754734-18e55d13e346?w=300' }
+          { name: 'Playera Oversize Black', price: '$180 MXN', img: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300' }
         ],
         wsp: '521234567890'
       },
       5: { 
         plan: 'premium', 
-        name: 'Tacos & Antojitos San José ⭐', 
+        name: 'Tacos San José ⭐', 
+        tagline: 'Comida corrida y Antojitos',
         cat: 'Pasillo 2 - Puesto 12 (Comida)', 
         status: '🌮 Paquete familiar incluye agua fresca gratis.',
         desc: 'Especialidades al pastor, comida corrida y aguas frescas naturales.',
         cover: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600',
         avatar: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200',
         products: [
-          { name: 'Orden de Tacos (5)', price: '$75 MXN', img: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300' },
-          { name: 'Agua Natural 1L', price: '$30 MXN', img: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' }
+          { name: 'Orden de Tacos (5)', price: '$75 MXN', img: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=300' }
+        ],
+        wsp: '521234567890'
+      },
+      6: { 
+        plan: 'premium', 
+        name: 'Juguetería El Niño ⭐', 
+        tagline: 'Juguetes, figuras y regalos',
+        cat: 'Pasillo 2 - Puesto 20 (Juguetes)', 
+        status: '🎁 Coleccionables de temporada disponibles.',
+        desc: 'Venta de juguetes didácticos, coleccionables de anime y regalos.',
+        cover: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=600',
+        avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200',
+        products: [
+          { name: 'Figura Coleccionable', price: '$320 MXN', img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300' }
         ],
         wsp: '521234567890'
       }
     };
 
+    // FUNCIONES DEL TOOLTIP FLOTANTE
+    const tooltip = document.getElementById('mapTooltip');
+    const tooltipAvatar = document.getElementById('tooltipAvatar');
+    const tooltipTitle = document.getElementById('tooltipTitle');
+    const tooltipTagline = document.getElementById('tooltipTagline');
+
+    function showTooltip(e, id) {
+      const data = shopsData[id] || (id > 3 ? shopsData[4] : shopsData[1]);
+      tooltipAvatar.src = data.avatar;
+      tooltipTitle.textContent = data.name;
+      tooltipTagline.textContent = data.tagline;
+      tooltip.classList.add('active');
+      moveTooltip(e);
+    }
+
+    function moveTooltip(e) {
+      tooltip.style.left = e.clientX + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+    }
+
+    function hideTooltip() {
+      tooltip.classList.remove('active');
+    }
+
+    // FUNCIONES DEL MODAL COMPLETO
     function openShop(id) {
+      hideTooltip();
       const data = shopsData[id] || (id > 3 ? shopsData[4] : shopsData[1]);
 
       document.getElementById('modalTitle').textContent = data.name;
@@ -378,7 +419,6 @@
         statusBox.style.display = 'none';
       }
 
-      // Renderizar catálogo adaptable
       const productGrid = document.getElementById('productGrid');
       productGrid.innerHTML = '';
 
