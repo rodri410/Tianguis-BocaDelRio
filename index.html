@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tianguis Digital — Mapa interactivo</title>
 <style>
+  .disclaimer-footer {
+    background-color: #f9f9f9;
+    color: #666;
+    text-align: center;
+    padding: 12px 20px;
+    font-size: 0.85rem;
+    border-top: 1px solid #eaeaea;
+    width: 100%;
+    margin-top: auto; /* Útil si usas flexbox en el body */
+}
+
+.disclaimer-content p {
+    margin: 0;
+    line-height: 1.4;
+}
   :root {
     --bg-page: #FBF4EA;      /* piso del mercado / fondo de la pagina */
     --bg-card: #FFFFFF;
@@ -2757,7 +2772,13 @@
   });
 })();
 </script>
-
+<footer class="disclaimer-footer">
+    <div class="disclaimer-content">
+        <p>
+            <small><strong>Aviso:</strong> Las imágenes de los locales y establecimientos mostrados en este sitio son únicamente con fines ilustrativos y pueden no corresponder a sus dimensiones o aspecto real.</small>
+        </p>
+    </div>
+</footer>
 </body>
 </html>
 
