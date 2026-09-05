@@ -304,12 +304,11 @@
 </header>
 
 <div class="filtros" id="filtros">
-  <button class="filtro-btn activo" data-cat="__todos__">Todos</button>
 </div>
 
 <div class="map-wrap">
   <div class="map-frame" id="mapFrame">
-    <img id="mapImage" src="TianguisDigital.png" alt="Mapa del Tianguis Digital" draggable="false">
+    <img id="mapImage" src="mapa-tianguis.png" alt="Mapa del Tianguis Digital" draggable="false">
     <svg viewBox="0 0 2160 2160" preserveAspectRatio="xMidYMid meet" id="overlaySvg">
 <rect class="local-hitbox" data-id="local-1" x="44" y="118" width="201" height="105" rx="14" tabindex="0" role="button" aria-label="Local 1, pasillo 1"></rect>
             <rect class="local-hitbox" data-id="local-2" x="119" y="338" width="101" height="114" rx="14" tabindex="0" role="button" aria-label="Local 2, pasillo 1"></rect>
@@ -2748,21 +2747,23 @@
     const btn = e.target.closest(".filtro-btn");
     if (!btn) return;
 
+    const cat = btn.dataset.cat;
+    const yaEstabaActivo = btn.classList.contains("activo");
+    const hitboxes = svg.querySelectorAll(".local-hitbox");
+
     filtrosWrap.querySelectorAll(".filtro-btn").forEach(function (b) {
       b.classList.remove("activo");
     });
-    btn.classList.add("activo");
 
-    const cat = btn.dataset.cat;
-    const hitboxes = svg.querySelectorAll(".local-hitbox");
-
-    if (cat === "__todos__") {
+    if (yaEstabaActivo) {
+      // se volvió a dar clic sobre la categoría ya activa -> se quita el filtro
       hitboxes.forEach(function (el) {
         el.classList.remove("dim", "match");
       });
       return;
     }
 
+    btn.classList.add("activo");
     hitboxes.forEach(function (el) {
       const shop = shopsData[el.dataset.id];
       const coincide = shop && shop.categoria === cat;
@@ -2781,6 +2782,5 @@
 </footer>
 </body>
 </html>
-
 
 
